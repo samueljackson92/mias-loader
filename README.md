@@ -1,9 +1,9 @@
-# mias-loader
+# MIAS Loader
 A tiny Python module for loading raw MIAS images into Numpy arrays.
 
 ## Installation
 
-Best installed using ```pip```:
+Best installed using ```pip```. Clone the repo and ```cd``` into the folder. Then run the following command:
 
 ```
     pip install -e .
