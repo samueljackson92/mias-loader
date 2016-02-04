@@ -4,14 +4,18 @@
 #include <sys/stat.h>
 
 typedef struct ImgShape {
-    unsigned int width, height;
+    unsigned int width, height, size;
 } ImgShape;
 
+/*
+    Get the size of the image to load as struct with members height and width.
+*/
 ImgShape get_file_size(char* filename) {
     ImgShape shape;
     shape.width = 0;
     shape.height = 0;
 
+    //get file pointer and check it's valid
     FILE *fp;
     fp = fopen(filename, "r");
 
@@ -21,10 +25,12 @@ ImgShape get_file_size(char* filename) {
         return shape;
     }
 
+    // get info from file
     struct stat buf;
     stat(filename, &buf);
-    int filesize=buf.st_size;
+    long long filesize=buf.st_size;
 
+    // find the size of the image
     shape.height = 4320;
     switch (filesize) {
         case (1600 * 4320): { shape.width = 1600; break; }
@@ -41,9 +47,13 @@ ImgShape get_file_size(char* filename) {
         }
     }
 
+    shape.size = shape.width * shape.height;
     return shape;
 }
 
+/*
+    Load the image into an array of unsigned ints
+*/
 void load_image(char * filename, unsigned int** buffer, int filesize) {
     FILE *fp;
     fp = fopen(filename, "r");
@@ -61,14 +71,4 @@ void load_image(char * filename, unsigned int** buffer, int filesize) {
     *buffer = (unsigned int *) malloc(filesize*sizeof(unsigned int));
     fread(*buffer, sizeof(*buffer), filesize, fp);
     fclose(fp);
-}
-
-int main() {
-    unsigned int *buffer;
-    ImgShape size = get_file_size("./mdb001lm");
-    load_image("./mdb001lm", &buffer, size.height*size.width);
-    printf("File size is: %d, %d\n", size.height, size.width);
-    printf("Done.\n");
-    free(buffer);
-    return 0;
 }

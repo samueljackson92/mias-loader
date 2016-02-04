@@ -9,7 +9,8 @@ c_uint_p = POINTER(c_uint)
 
 class ImgShape(Structure):
     _fields_ = [('width', c_uint),
-                ('height', c_uint)]
+                ('height', c_uint),
+                ('size', c_uint)]
 
 _get_file_size = libmias.get_file_size
 _get_file_size.argtypes = [POINTER(c_char)]
@@ -33,13 +34,12 @@ def get_image_shape(path):
         raise RuntimeError("Could not find file %s" % path)
 
     img_shape = _get_file_size(path)
-    shape = (img_shape.height, img_shape.width)
 
     # check the shape we got was valid
-    if len(shape) < 2 or (shape[0] == 0 and shape[1] == 0):
+    if img_shape.width == 0 and img_shape.height == 0:
         raise RuntimeError("Could not load image. Bad image shape. %s" % path)
 
-    return shape
+    return img_shape
 
 
 def load_image(path):
@@ -56,7 +56,8 @@ def load_image(path):
 
     # get the shape of the image
     shape = get_image_shape(path)
-    size = shape[0]*shape[1]
+    size = shape.size
+    shape = (shape.height, shape.width)
 
     # create somewhere to put the data
     img = np.empty(shape, dtype=np.uint32)
@@ -68,10 +69,3 @@ def load_image(path):
     img = np.ctypeslib.as_array(img_buff, (size,))
     img = img.reshape(shape, order='F')
     return img
-
-
-if __name__ == "__main__":
-    import skimage.io as io
-    img = load_image("./mdb001lm")
-    io.imshow(img)
-    io.show()
