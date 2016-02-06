@@ -9,8 +9,6 @@ Best installed using ```pip```:
     pip install -e .
 ```
 
-This will build the C extension and install the Python module.
-
 # Usage:
 
 Use the ```load_image``` function to get raw MIAS image data as a Numpy array.
